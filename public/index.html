@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TaskForge</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+    h1 { font-size: 1.5rem; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    li.done { opacity: 0.6; text-decoration: line-through; }
+    .id { font-size: 0.75rem; color: #888; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>TaskForge</h1>
+  <ul id="task-list">Loading tasks…</ul>
+
+  <script>
+    async function loadTasks() {
+      const list = document.getElementById('task-list');
+      try {
+        const res = await fetch('/tasks');
+        if (!res.ok) throw new Error('Failed to fetch tasks');
+        const tasks = await res.json();
+
+        list.innerHTML = '';
+        tasks.forEach((task) => {
+          const li = document.createElement('li');
+          if (task.completed) li.classList.add('done');
+          li.innerHTML = `
+            <span>${task.title || '<em>(missing title)</em>'}</span>
+            <span class="id">${task.id}</span>
+          `;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        list.innerHTML = `<li class="error">${err.message}</li>`;
+      }
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
